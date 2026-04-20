@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "version": "v1",
+  "generatedAt": "2026-04-19",
+  "sources": [
+    "https://www.smbc-card.com/",
+    "https://www.jcb.co.jp/",
+    "https://dcard.docomo.ne.jp/",
+    "https://pay.rakuten.co.jp/",
+    "https://www.jreast.co.jp/card/"
+  ]
+}

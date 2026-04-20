@@ -1,0 +1,147 @@
+[
+  {
+    "id": "smbc_nl",
+    "kind": "credit",
+    "brand": "Visa/Mastercard",
+    "issuer": "三井住友カード",
+    "displayName": "三井住友カード(NL)",
+    "baseReward": { "pointTypeId": "v_point", "rate": 1, "per": 200 },
+    "chargeableFrom": [],
+    "canPayDirectly": true,
+    "notes": "基本 0.5% (Vポイント)。対象店で最大7%はbonus-rulesで表現。"
+  },
+  {
+    "id": "rakuten_card",
+    "kind": "credit",
+    "brand": "Visa/Mastercard/JCB",
+    "issuer": "楽天カード",
+    "displayName": "楽天カード",
+    "baseReward": { "pointTypeId": "rakuten_point", "rate": 1, "per": 100 },
+    "chargeableFrom": [],
+    "canPayDirectly": true
+  },
+  {
+    "id": "jcb_w",
+    "kind": "credit",
+    "brand": "JCB",
+    "issuer": "JCB",
+    "displayName": "JCBカードW",
+    "baseReward": { "pointTypeId": "oki_doki", "rate": 2, "per": 1000 },
+    "chargeableFrom": [],
+    "canPayDirectly": true,
+    "notes": "1,000円で2pt (Oki Doki)。Wは通常の2倍。実質ポイント価値は用途で変動。"
+  },
+  {
+    "id": "d_card",
+    "kind": "credit",
+    "brand": "Visa/Mastercard",
+    "issuer": "NTTドコモ",
+    "displayName": "dカード",
+    "baseReward": { "pointTypeId": "d_point", "rate": 1, "per": 100 },
+    "chargeableFrom": [],
+    "canPayDirectly": true
+  },
+  {
+    "id": "aeon_card",
+    "kind": "credit",
+    "brand": "Visa/Mastercard/JCB",
+    "issuer": "イオン",
+    "displayName": "イオンカードセレクト",
+    "baseReward": { "pointTypeId": "waon_point", "rate": 1, "per": 200 },
+    "chargeableFrom": [],
+    "canPayDirectly": true
+  },
+  {
+    "id": "view_card",
+    "kind": "credit",
+    "brand": "Visa/JCB",
+    "issuer": "ビューカード",
+    "displayName": "ビューカード",
+    "baseReward": { "pointTypeId": "jre_point", "rate": 5, "per": 1000 },
+    "chargeableFrom": [],
+    "canPayDirectly": true,
+    "notes": "基本 1000円で5pt = 0.5%。Suicaチャージ時はbonus-rulesで1.5%にreplace。"
+  },
+  {
+    "id": "ana_sora",
+    "kind": "credit",
+    "brand": "JCB",
+    "issuer": "三菱UFJニコス (ANA提携)",
+    "displayName": "ソラチカカード",
+    "baseReward": { "pointTypeId": "ana_mile", "rate": 1, "per": 100 },
+    "canPayDirectly": true,
+    "chargeableFrom": [],
+    "notes": "100円で1マイル相当(移行手数料込の簡略化モデル)。実際はOki Doki経由で要移行。"
+  },
+  {
+    "id": "recruit_card",
+    "kind": "credit",
+    "brand": "Visa/Mastercard/JCB",
+    "issuer": "リクルート",
+    "displayName": "リクルートカード",
+    "baseReward": { "pointTypeId": "ponta", "rate": 12, "per": 1000 },
+    "chargeableFrom": [],
+    "canPayDirectly": true,
+    "notes": "1.2% 還元 (Pontaポイント)。"
+  },
+
+  {
+    "id": "suica",
+    "kind": "emoney",
+    "brand": "Suica",
+    "issuer": "JR東日本",
+    "displayName": "Suica",
+    "baseReward": null,
+    "canPayDirectly": true,
+    "chargeableFrom": [
+      { "fromMethodId": "view_card", "earnsPoints": true, "note": "ビューカードからのチャージで1.5%" }
+    ]
+  },
+  {
+    "id": "waon",
+    "kind": "emoney",
+    "brand": "WAON",
+    "issuer": "イオン",
+    "displayName": "WAON",
+    "baseReward": { "pointTypeId": "waon_point", "rate": 1, "per": 200 },
+    "canPayDirectly": true,
+    "chargeableFrom": [
+      { "fromMethodId": "aeon_card", "earnsPoints": true, "note": "オートチャージで0.5%" }
+    ]
+  },
+  {
+    "id": "rakuten_pay",
+    "kind": "qr",
+    "brand": "楽天ペイ",
+    "issuer": "楽天",
+    "displayName": "楽天ペイ",
+    "baseReward": { "pointTypeId": "rakuten_point", "rate": 1, "per": 100 },
+    "canPayDirectly": true,
+    "chargeableFrom": [
+      { "fromMethodId": "rakuten_card", "earnsPoints": true, "note": "楽天カードからチャージで+0.5% (合計1.5%)" }
+    ]
+  },
+  {
+    "id": "d_barai",
+    "kind": "qr",
+    "brand": "d払い",
+    "issuer": "NTTドコモ",
+    "displayName": "d払い",
+    "baseReward": { "pointTypeId": "d_point", "rate": 1, "per": 200 },
+    "canPayDirectly": true,
+    "chargeableFrom": [
+      { "fromMethodId": "d_card", "earnsPoints": true, "note": "dカードから d払い で支払うと合算1.5%" }
+    ]
+  },
+  {
+    "id": "paypay",
+    "kind": "qr",
+    "brand": "PayPay",
+    "issuer": "PayPay",
+    "displayName": "PayPay",
+    "baseReward": { "pointTypeId": "paypay_point", "rate": 1, "per": 200 },
+    "canPayDirectly": true,
+    "chargeableFrom": [],
+    "notes": "基本 0.5% (PayPayポイント)。キャンペーン次第で変動、詳細はbonus-rules."
+  }
+]

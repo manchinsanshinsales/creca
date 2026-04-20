@@ -1,0 +1,74 @@
+[
+  {
+    "id": "seven_eleven",
+    "chain": "セブン-イレブン",
+    "category": "convenience",
+    "acceptedMethodIds": [
+      "smbc_nl", "rakuten_card", "jcb_w", "d_card", "aeon_card", "view_card", "recruit_card",
+      "ana_sora", "rakuten_pay", "d_barai", "paypay", "suica", "waon"
+    ]
+  },
+  {
+    "id": "lawson",
+    "chain": "ローソン",
+    "category": "convenience",
+    "acceptedMethodIds": [
+      "smbc_nl", "rakuten_card", "jcb_w", "d_card", "aeon_card", "view_card", "recruit_card",
+      "ana_sora", "rakuten_pay", "d_barai", "paypay", "suica", "waon"
+    ]
+  },
+  {
+    "id": "familymart",
+    "chain": "ファミリーマート",
+    "category": "convenience",
+    "acceptedMethodIds": [
+      "smbc_nl", "rakuten_card", "jcb_w", "d_card", "aeon_card", "view_card", "recruit_card",
+      "ana_sora", "rakuten_pay", "d_barai", "paypay", "suica"
+    ]
+  },
+  {
+    "id": "mcdonalds",
+    "chain": "マクドナルド",
+    "category": "fastfood",
+    "acceptedMethodIds": [
+      "smbc_nl", "rakuten_card", "jcb_w", "d_card", "aeon_card", "recruit_card", "ana_sora",
+      "d_barai", "paypay", "rakuten_pay", "waon", "suica"
+    ]
+  },
+  {
+    "id": "starbucks",
+    "chain": "スターバックス",
+    "category": "cafe",
+    "acceptedMethodIds": [
+      "smbc_nl", "rakuten_card", "jcb_w", "d_card", "view_card", "recruit_card", "ana_sora",
+      "d_barai", "paypay", "rakuten_pay", "suica"
+    ]
+  },
+  {
+    "id": "saizeriya",
+    "chain": "サイゼリヤ",
+    "category": "restaurant",
+    "acceptedMethodIds": [
+      "smbc_nl", "rakuten_card", "jcb_w", "d_card", "ana_sora",
+      "paypay", "suica"
+    ]
+  },
+  {
+    "id": "aeon",
+    "chain": "イオン",
+    "category": "supermarket",
+    "acceptedMethodIds": [
+      "smbc_nl", "rakuten_card", "jcb_w", "aeon_card", "ana_sora",
+      "paypay", "d_barai", "waon", "suica"
+    ]
+  },
+  {
+    "id": "jr_ekinaka",
+    "chain": "JR駅ナカ (エキュート等)",
+    "category": "transit",
+    "acceptedMethodIds": [
+      "smbc_nl", "rakuten_card", "jcb_w", "view_card", "recruit_card", "ana_sora",
+      "suica"
+    ]
+  }
+]

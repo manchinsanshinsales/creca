@@ -1,0 +1,11 @@
+[
+  { "id": "rakuten_point", "name": "楽天ポイント", "issuer": "楽天", "monetaryValuePerPoint": 1 },
+  { "id": "v_point", "name": "Vポイント", "issuer": "三井住友/SMBC", "monetaryValuePerPoint": 1 },
+  { "id": "d_point", "name": "dポイント", "issuer": "NTTドコモ", "monetaryValuePerPoint": 1 },
+  { "id": "ponta", "name": "Pontaポイント", "issuer": "ロイヤリティマーケティング", "monetaryValuePerPoint": 1 },
+  { "id": "jre_point", "name": "JREポイント", "issuer": "JR東日本", "monetaryValuePerPoint": 1 },
+  { "id": "waon_point", "name": "WAON POINT", "issuer": "イオン", "monetaryValuePerPoint": 1 },
+  { "id": "paypay_point", "name": "PayPayポイント", "issuer": "PayPay", "monetaryValuePerPoint": 1 },
+  { "id": "oki_doki", "name": "Oki Dokiポイント", "issuer": "JCB", "monetaryValuePerPoint": 5, "notes": "ANAマイル移行前提なら1pt=5円相当の評価 (目安)" },
+  { "id": "ana_mile", "name": "ANAマイル", "issuer": "ANA", "monetaryValuePerPoint": 1.7, "notes": "特典航空券利用を前提にした目安。ユーザー設定で上書き推奨" }
+]

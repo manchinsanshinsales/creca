@@ -1,0 +1,104 @@
+[
+  {
+    "id": "smbc_nl_7p",
+    "label": "三井住友NL 対象店 最大7%還元 (Visaタッチ/iDで利用時)",
+    "trigger": {
+      "kind": "pay",
+      "methodId": "smbc_nl",
+      "storeIds": ["seven_eleven", "lawson", "mcdonalds", "saizeriya"]
+    },
+    "reward": { "pointTypeId": "v_point", "rate": 14, "per": 200 },
+    "stacking": "replace",
+    "monthlyCapPoints": 30000,
+    "source": "https://www.smbc-card.com/",
+    "validFrom": "2024-04-01"
+  },
+  {
+    "id": "jcb_w_starbucks",
+    "label": "JCB W スタバ オンライン入金で10倍",
+    "trigger": {
+      "kind": "pay",
+      "methodId": "jcb_w",
+      "storeIds": ["starbucks"]
+    },
+    "reward": { "pointTypeId": "oki_doki", "rate": 10, "per": 1000 },
+    "stacking": "replace",
+    "source": "https://www.jcb.co.jp/"
+  },
+  {
+    "id": "dcard_mcd",
+    "label": "dカード マクドナルド +3倍 (合計4%)",
+    "trigger": {
+      "kind": "pay",
+      "methodId": "d_card",
+      "storeIds": ["mcdonalds"]
+    },
+    "reward": { "pointTypeId": "d_point", "rate": 3, "per": 100 },
+    "stacking": "add",
+    "source": "https://dcard.docomo.ne.jp/"
+  },
+  {
+    "id": "aeon_card_aeon",
+    "label": "イオンカード イオン系列で2倍",
+    "trigger": {
+      "kind": "pay",
+      "methodId": "aeon_card",
+      "storeIds": ["aeon"]
+    },
+    "reward": { "pointTypeId": "waon_point", "rate": 1, "per": 200 },
+    "stacking": "add",
+    "source": "https://www.aeon.co.jp/"
+  },
+
+  {
+    "id": "view_to_suica",
+    "label": "ビューカード → Suica チャージで 1.5% (JREポイント3倍)",
+    "trigger": {
+      "kind": "charge",
+      "fromMethodId": "view_card",
+      "toMethodId": "suica"
+    },
+    "reward": { "pointTypeId": "jre_point", "rate": 15, "per": 1000 },
+    "stacking": "replace",
+    "source": "https://www.jreast.co.jp/card/"
+  },
+  {
+    "id": "rakuten_to_rakutenpay",
+    "label": "楽天カード → 楽天ペイ チャージで +0.5%",
+    "trigger": {
+      "kind": "charge",
+      "fromMethodId": "rakuten_card",
+      "toMethodId": "rakuten_pay"
+    },
+    "reward": { "pointTypeId": "rakuten_point", "rate": 1, "per": 200 },
+    "stacking": "replace",
+    "source": "https://pay.rakuten.co.jp/"
+  },
+  {
+    "id": "aeon_to_waon",
+    "label": "イオンカード オートチャージで 0.5% (WAON POINT)",
+    "trigger": {
+      "kind": "charge",
+      "fromMethodId": "aeon_card",
+      "toMethodId": "waon"
+    },
+    "reward": { "pointTypeId": "waon_point", "rate": 1, "per": 200 },
+    "stacking": "replace",
+    "source": "https://www.aeon.co.jp/"
+  },
+
+  {
+    "id": "expired_example",
+    "label": "(過去) 楽天ペイ 期間限定キャンペーン 例 — テスト用",
+    "trigger": {
+      "kind": "pay",
+      "methodId": "rakuten_pay",
+      "storeIds": "*"
+    },
+    "reward": { "pointTypeId": "rakuten_point", "rate": 5, "per": 100 },
+    "stacking": "add",
+    "validFrom": "2023-01-01",
+    "validTo": "2023-01-31",
+    "source": "test-fixture"
+  }
+]
