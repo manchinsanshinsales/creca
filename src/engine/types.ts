@@ -25,7 +25,7 @@ export type RankedRoute = {
   breakdown: RewardBreakdown[];
   totalByPointType: Record<string, number>;
   totalYenByPointType: Record<string, number>;
-  expiringBonus?: string;
+  expiringBonuses: string[];
   capHints: string[];
 };
 

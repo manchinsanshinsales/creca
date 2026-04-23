@@ -46,6 +46,11 @@ export function RecommendView({ db }: { db: DataBundle }) {
     saveAmount(amount);
   }, [amount]);
 
+  const isDataStale = useMemo(() => {
+    const generated = Date.parse(db.manifest.generatedAt);
+    return Date.now() - generated > 30 * 24 * 60 * 60 * 1000;
+  }, [db.manifest.generatedAt]);
+
   const storesByCategory = useMemo(() => {
     const map = new Map<StoreCategory, Store[]>();
     for (const s of db.stores) {
@@ -83,6 +88,11 @@ export function RecommendView({ db }: { db: DataBundle }) {
 
   return (
     <div className="space-y-5 pt-2">
+      {isDataStale && (
+        <div className="rounded-xl border border-warn/40 bg-warn/10 px-4 py-2 text-xs text-warn">
+          ⚠ データが 30 日以上更新されていません。ボーナス情報が古い可能性があります。
+        </div>
+      )}
       <section className="space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold">店舗</h2>
@@ -221,7 +231,7 @@ function AmountInput({
         value={amount}
         onChange={(e) => {
           const n = Number(e.target.value);
-          if (Number.isFinite(n) && n >= 0) onChange(n);
+          if (Number.isFinite(n) && n > 0) onChange(n);
         }}
         className="w-24 rounded-lg border border-border bg-surface2 px-2 py-1 text-right tabular-nums outline-none focus:border-accent/60"
       />
@@ -326,8 +336,12 @@ function BestRouteCard({
           ))}
         </div>
       )}
-      {route.expiringBonus && (
-        <div className="text-xs text-warn">⏳ {route.expiringBonus}</div>
+      {route.expiringBonuses.length > 0 && (
+        <div className="space-y-0.5 text-xs text-warn">
+          {route.expiringBonuses.map((msg, i) => (
+            <div key={i}>⏳ {msg}</div>
+          ))}
+        </div>
       )}
     </div>
   );

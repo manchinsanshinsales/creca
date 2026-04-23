@@ -6,9 +6,19 @@ import type {
 } from "@/schemas";
 import type { ComputeContext, Hop, PointsEarned, RewardBreakdown } from "./types";
 
+function parseLocalDayStart(s: string): number {
+  const [y, m, d] = s.split("-").map(Number);
+  return new Date(y, m - 1, d).getTime();
+}
+
+function parseLocalDayEnd(s: string): number {
+  const [y, m, d] = s.split("-").map(Number);
+  return new Date(y, m - 1, d, 23, 59, 59, 999).getTime();
+}
+
 export function isRuleActive(rule: BonusRule, now: Date): boolean {
-  if (rule.validFrom && Date.parse(rule.validFrom) > now.getTime()) return false;
-  if (rule.validTo && Date.parse(rule.validTo) < now.getTime()) return false;
+  if (rule.validFrom && parseLocalDayStart(rule.validFrom) > now.getTime()) return false;
+  if (rule.validTo && parseLocalDayEnd(rule.validTo) < now.getTime()) return false;
   return true;
 }
 

@@ -90,6 +90,8 @@ export const BonusTriggerSchema = z.discriminatedUnion("kind", [
 ]);
 export type BonusTrigger = z.infer<typeof BonusTriggerSchema>;
 
+const IsoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+
 export const BonusRuleSchema = z.object({
   id: z.string(),
   trigger: BonusTriggerSchema,
@@ -97,8 +99,8 @@ export const BonusRuleSchema = z.object({
   stacking: z.enum(["replace", "add"]),
   monthlyCapYen: z.number().positive().optional(),
   monthlyCapPoints: z.number().positive().optional(),
-  validFrom: z.string().optional(),
-  validTo: z.string().optional(),
+  validFrom: IsoDateSchema.optional(),
+  validTo: IsoDateSchema.optional(),
   source: z.string().optional(),
   label: z.string().optional(),
 });
