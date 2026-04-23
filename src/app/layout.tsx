@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { Suspense } from "react";
+import { BottomNav } from "@/components/BottomNav";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -30,21 +32,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ja">
       <body className="min-h-screen font-sans">
         <header className="sticky top-0 z-10 border-b border-border bg-bg/80 backdrop-blur">
-          <nav className="mx-auto flex max-w-xl items-center justify-between px-4 py-3">
+          <div className="mx-auto flex max-w-xl items-center px-4 py-3">
             <Link href="/" className="text-lg font-bold tracking-tight">
               <span className="text-accent">creca</span>
             </Link>
-            <div className="flex gap-1 text-sm">
-              <Link href="/recommend" className="btn">
-                推薦
-              </Link>
-              <Link href="/wallet" className="btn">
-                保有
-              </Link>
-            </div>
-          </nav>
+          </div>
         </header>
         <main className="mx-auto max-w-xl px-4 pb-24 pt-4">{children}</main>
+        <Suspense fallback={null}>
+          <BottomNav />
+        </Suspense>
         <ServiceWorkerRegister />
       </body>
     </html>

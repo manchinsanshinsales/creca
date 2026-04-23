@@ -33,4 +33,32 @@ body {
   .btn-primary {
     @apply border-accent/40 bg-accent/20 text-accent hover:bg-accent/30;
   }
+  .bottom-nav {
+    @apply fixed bottom-0 left-0 right-0 z-20 border-t border-border bg-bg/90 backdrop-blur;
+  }
+  .bottom-nav-tab {
+    @apply flex flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] text-muted transition-colors;
+  }
+  .bottom-nav-tab-active {
+    @apply text-accent;
+  }
+  .method-row {
+    @apply flex items-center gap-3 rounded-2xl border border-border bg-surface px-4 py-3 transition-colors active:bg-surface2;
+  }
+  .icon-badge {
+    @apply flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl text-base font-bold;
+  }
+  .section-header {
+    @apply text-[11px] font-semibold uppercase tracking-widest text-muted;
+  }
+  .search-input {
+    @apply w-full rounded-2xl border border-border bg-surface2 px-4 py-3 text-sm outline-none placeholder:text-muted focus:border-accent/50;
+  }
+}
+
+.scrollbar-none {
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
