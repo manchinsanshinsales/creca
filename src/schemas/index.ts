@@ -65,6 +65,7 @@ export const StoreSchema = z.object({
   chain: z.string(),
   category: StoreCategorySchema,
   acceptedMethodIds: z.array(z.string()),
+  aliases: z.array(z.string()).default([]),
   notes: z.string().optional(),
 });
 export type Store = z.infer<typeof StoreSchema>;

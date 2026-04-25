@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import type { DataBundle, Store, StoreCategory } from "@/schemas";
+import type { DataBundle, Store } from "@/schemas";
 import { recommend } from "@/engine/recommend";
 import type { RankedRoute, Hop } from "@/engine/types";
 import {
@@ -12,19 +12,8 @@ import {
   saveAmount,
   useWallet,
 } from "@/lib/storage";
+import { searchStores, buildSearchIndex } from "@/lib/search";
 import { formatPoints, formatRate, formatYen } from "@/lib/format";
-
-const categoryLabel: Record<StoreCategory, string> = {
-  convenience: "コンビニ",
-  fastfood: "ファスト",
-  cafe: "カフェ",
-  restaurant: "レストラン",
-  supermarket: "スーパー",
-  drugstore: "ドラッグ",
-  transit: "交通",
-  ecommerce: "EC",
-  other: "その他",
-};
 
 export function RecommendView({ db }: { db: DataBundle }) {
   const [wallet, , walletReady] = useWallet();
@@ -32,6 +21,14 @@ export function RecommendView({ db }: { db: DataBundle }) {
   const [amount, setAmount] = useState<number>(1000);
   const [recent, setRecent] = useState<string[]>([]);
   const [search, setSearch] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const dropdownRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    buildSearchIndex(db.stores);
+  }, [db.stores]);
 
   useEffect(() => {
     setAmount(getSavedAmount());
@@ -51,21 +48,10 @@ export function RecommendView({ db }: { db: DataBundle }) {
     return Date.now() - generated > 30 * 24 * 60 * 60 * 1000;
   }, [db.manifest.generatedAt]);
 
-  const storesByCategory = useMemo(() => {
-    const map = new Map<StoreCategory, Store[]>();
-    for (const s of db.stores) {
-      const list = map.get(s.category) ?? [];
-      list.push(s);
-      map.set(s.category, list);
-    }
-    return map;
-  }, [db.stores]);
-
-  const filteredStores = useMemo(() => {
-    if (!search.trim()) return null;
-    const q = search.trim().toLowerCase();
-    return db.stores.filter((s) => s.chain.toLowerCase().includes(q) || s.id.includes(q));
-  }, [db.stores, search]);
+  const suggestions = useMemo<Store[]>(() => {
+    if (!search.trim()) return [];
+    return searchStores(search, db.stores).slice(0, 6);
+  }, [search, db.stores]);
 
   const recentResolved = recent
     .map((id) => db.stores.find((s) => s.id === id))
@@ -86,130 +72,169 @@ export function RecommendView({ db }: { db: DataBundle }) {
     });
   }, [store, walletReady, wallet, db, amount]);
 
+  function selectStore(id: string) {
+    setStoreId(id);
+    setSearch("");
+    setDropdownOpen(false);
+    setActiveIdx(-1);
+  }
+
+  function resetStore() {
+    setStoreId(null);
+    setSearch("");
+    setTimeout(() => searchRef.current?.focus(), 50);
+  }
+
+  function handleSearchKeyDown(e: React.KeyboardEvent) {
+    if (!dropdownOpen || suggestions.length === 0) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIdx((i) => Math.min(i + 1, suggestions.length - 1));
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIdx((i) => Math.max(i - 1, -1));
+    } else if (e.key === "Enter" && activeIdx >= 0) {
+      e.preventDefault();
+      selectStore(suggestions[activeIdx].id);
+    } else if (e.key === "Escape") {
+      setDropdownOpen(false);
+    }
+  }
+
+  if (store) {
+    return (
+      <div className="space-y-5 pt-2">
+        {isDataStale && <StaleDataBanner />}
+
+        <div className="card flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="truncate text-lg font-semibold">{store.chain}</div>
+          </div>
+          <AmountInput amount={amount} onChange={setAmount} />
+        </div>
+
+        {!walletReady ? (
+          <div className="text-sm text-muted">読み込み中…</div>
+        ) : wallet.ownedMethodIds.length === 0 ? (
+          <div className="card space-y-2 text-sm">
+            <div>保有している決済がまだ登録されていません。</div>
+            <Link href="/wallet" className="btn btn-primary">
+              保有決済を登録する
+            </Link>
+          </div>
+        ) : routes.length === 0 ? (
+          <div className="card text-sm">
+            この店舗で使える保有決済がありません。
+            <Link href="/wallet" className="text-accent underline ml-1">
+              手段を追加
+            </Link>
+          </div>
+        ) : (
+          <RouteResults routes={routes} db={db} amount={amount} />
+        )}
+
+        <button
+          onClick={resetStore}
+          className="w-full rounded-xl border border-border bg-surface2 py-3 text-sm text-muted hover:border-accent/40 hover:text-accent"
+        >
+          別の店舗を調べる →
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-5 pt-2">
-      {isDataStale && (
-        <div className="rounded-xl border border-warn/40 bg-warn/10 px-4 py-2 text-xs text-warn">
-          ⚠ データが 30 日以上更新されていません。ボーナス情報が古い可能性があります。
-        </div>
-      )}
-      <section className="space-y-2">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold">店舗</h2>
-          {store && (
-            <button
-              onClick={() => setStoreId(null)}
-              className="text-xs text-muted underline"
-            >
-              変更
-            </button>
-          )}
-        </div>
+      {isDataStale && <StaleDataBanner />}
 
-        {!store && (
-          <>
-            <input
-              type="search"
-              inputMode="search"
-              placeholder="店舗名で検索 (例: セブン)"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full rounded-xl border border-border bg-surface2 px-4 py-3 text-base outline-none focus:border-accent/60"
-            />
+      <div className="relative">
+        <input
+          ref={searchRef}
+          type="search"
+          inputMode="search"
+          autoComplete="off"
+          autoFocus
+          placeholder="店舗名で検索 (例: スタバ、マック、セブン)"
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            setDropdownOpen(true);
+            setActiveIdx(-1);
+          }}
+          onFocus={() => search.trim() && setDropdownOpen(true)}
+          onBlur={() => setTimeout(() => setDropdownOpen(false), 150)}
+          onKeyDown={handleSearchKeyDown}
+          className="w-full rounded-2xl border border-border bg-surface2 px-5 py-4 text-lg outline-none focus:border-accent/60 focus:ring-2 focus:ring-accent/20"
+        />
 
-            {filteredStores ? (
-              <div className="flex flex-wrap gap-2">
-                {filteredStores.length === 0 ? (
-                  <span className="text-xs text-muted">該当なし</span>
-                ) : (
-                  filteredStores.map((s) => (
-                    <button
-                      key={s.id}
-                      onClick={() => {
-                        setStoreId(s.id);
-                        setSearch("");
-                      }}
-                      className="chip"
-                    >
-                      {s.chain}
-                    </button>
-                  ))
-                )}
-              </div>
-            ) : (
-              <>
-                {recentResolved.length > 0 && (
-                  <div className="space-y-1">
-                    <div className="text-xs text-muted">最近使った店</div>
-                    <div className="flex flex-wrap gap-2">
-                      {recentResolved.map((s) => (
-                        <button
-                          key={s.id}
-                          onClick={() => setStoreId(s.id)}
-                          className="chip chip-active"
-                        >
-                          {s.chain}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                {[...storesByCategory.entries()].map(([cat, list]) => (
-                  <div key={cat} className="space-y-1">
-                    <div className="text-xs text-muted">{categoryLabel[cat]}</div>
-                    <div className="flex flex-wrap gap-2">
-                      {list.map((s) => (
-                        <button
-                          key={s.id}
-                          onClick={() => setStoreId(s.id)}
-                          className="chip"
-                        >
-                          {s.chain}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </>
-            )}
-          </>
+        {dropdownOpen && suggestions.length > 0 && (
+          <ul
+            ref={dropdownRef}
+            className="absolute top-full z-20 mt-1 w-full overflow-hidden rounded-2xl border border-border bg-surface2 shadow-lg"
+          >
+            {suggestions.map((s, i) => (
+              <li key={s.id}>
+                <button
+                  onMouseDown={() => selectStore(s.id)}
+                  className={`flex w-full items-center justify-between px-5 py-3 text-left text-sm hover:bg-accent/10 ${
+                    i === activeIdx ? "bg-accent/10 text-accent" : ""
+                  }`}
+                >
+                  <span className="font-medium">{s.chain}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
         )}
+      </div>
 
-        {store && (
-          <div className="card flex items-center justify-between">
-            <div>
-              <div className="text-xs text-muted">{categoryLabel[store.category]}</div>
-              <div className="text-lg font-semibold">{store.chain}</div>
-            </div>
-            <AmountInput amount={amount} onChange={setAmount} />
-          </div>
-        )}
-      </section>
-
-      {store && (
+      {!search.trim() && (
         <>
-          {!walletReady ? (
-            <div className="text-sm text-muted">読み込み中…</div>
-          ) : wallet.ownedMethodIds.length === 0 ? (
-            <div className="card space-y-2 text-sm">
-              <div>保有している決済がまだ登録されていません。</div>
-              <Link href="/wallet" className="btn btn-primary">
-                保有決済を登録する
-              </Link>
+          {recentResolved.length > 0 && (
+            <div className="space-y-2">
+              <div className="text-xs text-muted">最近使った店</div>
+              <div className="flex flex-wrap gap-2">
+                {recentResolved.map((s) => (
+                  <button
+                    key={s.id}
+                    onClick={() => selectStore(s.id)}
+                    className="chip chip-active"
+                  >
+                    {s.chain}
+                  </button>
+                ))}
+              </div>
             </div>
-          ) : routes.length === 0 ? (
-            <div className="card text-sm">
-              この店舗で使える保有決済がありません。別の店舗を選ぶか
-              <Link href="/wallet" className="text-accent underline">
-                手段を追加
-              </Link>
-              してください。
-            </div>
-          ) : (
-            <RouteResults routes={routes} db={db} amount={amount} />
           )}
+
+          <div className="space-y-2">
+            <div className="text-xs text-muted">すべての店舗</div>
+            <div className="flex flex-wrap gap-2">
+              {db.stores.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => selectStore(s.id)}
+                  className="chip"
+                >
+                  {s.chain}
+                </button>
+              ))}
+            </div>
+          </div>
         </>
       )}
+
+      {search.trim() && suggestions.length === 0 && !dropdownOpen && (
+        <div className="text-sm text-muted">該当する店舗がありません</div>
+      )}
+    </div>
+  );
+}
+
+function StaleDataBanner() {
+  return (
+    <div className="rounded-xl border border-warn/40 bg-warn/10 px-4 py-2 text-xs text-warn">
+      ⚠ データが 30 日以上更新されていません。ボーナス情報が古い可能性があります。
     </div>
   );
 }
@@ -222,7 +247,7 @@ function AmountInput({
   onChange: (n: number) => void;
 }) {
   return (
-    <label className="flex items-center gap-1 text-sm">
+    <label className="flex shrink-0 items-center gap-1 text-sm">
       <span className="text-muted">¥</span>
       <input
         type="number"
@@ -288,7 +313,6 @@ function HopChips({ hops }: { hops: Hop[] }) {
       }
     }
   }
-  // Deduplicate while preserving order
   const seen = new Set<string>();
   const dedup = items.filter((i) => {
     if (seen.has(i.label)) return false;
