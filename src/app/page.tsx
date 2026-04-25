@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { loadData } from "@/data/loader";
+import { HomeStats } from "@/components/HomeStats";
 
 export default function HomePage() {
   const db = loadData();
@@ -16,6 +17,8 @@ export default function HomePage() {
           チャージ経路も含めて計算して提案します。
         </p>
       </section>
+
+      <HomeStats stores={db.stores} />
 
       <section className="grid grid-cols-2 gap-2">
         <Link href="/recommend" className="btn btn-primary h-16 text-base">

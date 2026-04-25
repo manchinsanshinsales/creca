@@ -2,10 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { DataBundle, Store } from "@/schemas";
 import { recommend } from "@/engine/recommend";
 import type { RankedRoute, Hop } from "@/engine/types";
 import {
+  addPaymentLog,
   getRecentStores,
   getSavedAmount,
   pushRecentStore,
@@ -16,6 +18,7 @@ import { searchStores, buildSearchIndex } from "@/lib/search";
 import { formatPoints, formatRate, formatYen } from "@/lib/format";
 
 export function RecommendView({ db }: { db: DataBundle }) {
+  const searchParams = useSearchParams();
   const [wallet, , walletReady] = useWallet();
   const [storeId, setStoreId] = useState<string | null>(null);
   const [amount, setAmount] = useState<number>(1000);
@@ -33,6 +36,11 @@ export function RecommendView({ db }: { db: DataBundle }) {
   useEffect(() => {
     setAmount(getSavedAmount());
     setRecent(getRecentStores());
+    const paramStore = searchParams.get("store");
+    if (paramStore && db.stores.some((s) => s.id === paramStore)) {
+      setStoreId(paramStore);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -130,7 +138,7 @@ export function RecommendView({ db }: { db: DataBundle }) {
             </Link>
           </div>
         ) : (
-          <RouteResults routes={routes} db={db} amount={amount} />
+          <RouteResults routes={routes} db={db} amount={amount} store={store} />
         )}
 
         <button
@@ -268,16 +276,38 @@ function RouteResults({
   routes,
   db,
   amount,
+  store,
 }: {
   routes: RankedRoute[];
   db: DataBundle;
   amount: number;
+  store: Store;
 }) {
   const [expanded, setExpanded] = useState(false);
+  const [paidRouteId, setPaidRouteId] = useState<string | null>(null);
+
+  function handlePaid(route: RankedRoute) {
+    addPaymentLog({
+      storeId: store.id,
+      storeName: store.chain,
+      amountYen: amount,
+      earnedYen: route.effectiveYen,
+      timestamp: Date.now(),
+    });
+    setPaidRouteId(route.id);
+    setTimeout(() => setPaidRouteId(null), 3000);
+  }
+
   const [best, ...rest] = routes;
   return (
     <div className="space-y-3">
-      <BestRouteCard route={best} db={db} amount={amount} />
+      <BestRouteCard
+        route={best}
+        db={db}
+        amount={amount}
+        onPaid={handlePaid}
+        paidConfirmed={paidRouteId === best.id}
+      />
       {rest.length > 0 && (
         <>
           <button
@@ -289,7 +319,14 @@ function RouteResults({
           {expanded && (
             <div className="space-y-2">
               {rest.map((r) => (
-                <AltRouteCard key={r.id} route={r} db={db} amount={amount} />
+                <AltRouteCard
+                  key={r.id}
+                  route={r}
+                  db={db}
+                  amount={amount}
+                  onPaid={handlePaid}
+                  paidConfirmed={paidRouteId === r.id}
+                />
               ))}
             </div>
           )}
@@ -358,10 +395,14 @@ function BestRouteCard({
   route,
   db,
   amount,
+  onPaid,
+  paidConfirmed,
 }: {
   route: RankedRoute;
   db: DataBundle;
   amount: number;
+  onPaid: (r: RankedRoute) => void;
+  paidConfirmed: boolean;
 }) {
   return (
     <div className="card space-y-3 border-accent/40 bg-gradient-to-b from-accent/10 to-transparent">
@@ -391,6 +432,7 @@ function BestRouteCard({
           ))}
         </div>
       )}
+      <PaidButton route={route} onPaid={onPaid} confirmed={paidConfirmed} />
     </div>
   );
 }
@@ -399,10 +441,14 @@ function AltRouteCard({
   route,
   db,
   amount,
+  onPaid,
+  paidConfirmed,
 }: {
   route: RankedRoute;
   db: DataBundle;
   amount: number;
+  onPaid: (r: RankedRoute) => void;
+  paidConfirmed: boolean;
 }) {
   return (
     <div className="card space-y-2">
@@ -414,7 +460,35 @@ function AltRouteCard({
         </div>
       </div>
       <PointBreakdown route={route} db={db} amount={amount} compact />
+      <PaidButton route={route} onPaid={onPaid} confirmed={paidConfirmed} />
     </div>
+  );
+}
+
+function PaidButton({
+  route,
+  onPaid,
+  confirmed,
+}: {
+  route: RankedRoute;
+  onPaid: (r: RankedRoute) => void;
+  confirmed: boolean;
+}) {
+  if (confirmed) {
+    return (
+      <div className="flex items-center gap-1.5 rounded-xl border border-green-500/30 bg-green-500/10 px-3 py-2 text-sm text-green-400">
+        <span>✓</span>
+        <span>+{formatYen(route.effectiveYen)} を記録しました</span>
+      </div>
+    );
+  }
+  return (
+    <button
+      onClick={() => onPaid(route)}
+      className="w-full rounded-xl border border-border bg-surface2 py-2 text-sm text-muted transition-colors hover:border-accent/40 hover:text-accent active:scale-[0.98]"
+    >
+      この方法で支払った
+    </button>
   );
 }
 
