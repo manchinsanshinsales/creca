@@ -10,6 +10,7 @@
     "reward": { "pointTypeId": "v_point", "rate": 14, "per": 200 },
     "stacking": "replace",
     "monthlyCapPoints": 30000,
+    "requiredInterfaces": ["touch", "id"],
     "source": "https://www.smbc-card.com/",
     "validFrom": "2024-04-01"
   },

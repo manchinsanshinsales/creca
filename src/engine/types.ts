@@ -1,4 +1,4 @@
-import type { BonusRule, DataBundle, PaymentMethod, PointType, Reward, UserWallet } from "@/schemas";
+import type { BonusRule, DataBundle, PaymentInterface, PaymentMethod, PointType, Reward, UserWallet } from "@/schemas";
 
 export type Hop =
   | { kind: "charge"; from: PaymentMethod; to: PaymentMethod }
@@ -27,6 +27,7 @@ export type RankedRoute = {
   totalYenByPointType: Record<string, number>;
   expiringBonuses: string[];
   capHints: string[];
+  requiredInterfaces: PaymentInterface[];
 };
 
 export type RecommendInput = {

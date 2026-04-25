@@ -331,6 +331,29 @@ function HopChips({ hops }: { hops: Hop[] }) {
   );
 }
 
+const interfaceLabel: Record<string, string> = {
+  touch: "タッチ決済",
+  id: "iD",
+  quicpay: "QUICPay",
+  qr: "QRコード",
+  code: "バーコード",
+  physical: "カード",
+};
+
+function InterfaceBadges({ interfaces }: { interfaces: string[] }) {
+  if (interfaces.length === 0) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-1 text-xs">
+      <span className="text-muted">支払方法:</span>
+      {interfaces.map((i) => (
+        <span key={i} className="rounded-md bg-accent/15 px-2 py-0.5 font-medium text-accent">
+          {interfaceLabel[i] ?? i}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 function BestRouteCard({
   route,
   db,
@@ -352,6 +375,7 @@ function BestRouteCard({
         </div>
       </div>
       <HopChips hops={route.hops} />
+      <InterfaceBadges interfaces={route.requiredInterfaces} />
       <PointBreakdown route={route} db={db} amount={amount} />
       {route.capHints.length > 0 && (
         <div className="text-xs text-warn">

@@ -93,6 +93,16 @@ export type BonusTrigger = z.infer<typeof BonusTriggerSchema>;
 
 const IsoDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
 
+export const PaymentInterfaceSchema = z.enum([
+  "touch",     // Visa/Mastercard/JCB Contactless
+  "physical",  // Swipe / chip insert
+  "id",        // iD (Docomo NFC)
+  "quicpay",   // QUICPay (JCB NFC)
+  "qr",        // QR code (user scans store QR)
+  "code",      // Barcode/code (user shows code at register)
+]);
+export type PaymentInterface = z.infer<typeof PaymentInterfaceSchema>;
+
 export const BonusRuleSchema = z.object({
   id: z.string(),
   trigger: BonusTriggerSchema,
@@ -100,6 +110,8 @@ export const BonusRuleSchema = z.object({
   stacking: z.enum(["replace", "add"]),
   monthlyCapYen: z.number().positive().optional(),
   monthlyCapPoints: z.number().positive().optional(),
+  minAmountYen: z.number().positive().optional(),
+  requiredInterfaces: z.array(PaymentInterfaceSchema).optional(),
   validFrom: IsoDateSchema.optional(),
   validTo: IsoDateSchema.optional(),
   source: z.string().optional(),
