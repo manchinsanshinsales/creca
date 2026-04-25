@@ -30,7 +30,8 @@ export function recommend(input: RecommendInput): RankedRoute[] {
     const breakdown: RankedRoute["breakdown"] = [];
     const upstreamIds: string[] = [];
     const capHints: string[] = [];
-    let expiring: string | undefined;
+    const expiringBonuses: string[] = [];
+    const requiredInterfaceSet = new Set<string>();
 
     for (const hop of hops) {
       const b = computeHopRewards(hop, upstreamIds, amountYen, store, ctx);
@@ -38,8 +39,11 @@ export function recommend(input: RecommendInput): RankedRoute[] {
       if (b.cappedNotice) capHints.push(b.cappedNotice);
       for (const ruleId of b.appliedRuleIds) {
         const rule = db.bonusRules.find((r) => r.id === ruleId);
-        if (rule?.validTo && !expiring) {
-          expiring = `${rule.label ?? ruleId} は ${rule.validTo} まで`;
+        if (rule?.validTo) {
+          expiringBonuses.push(`${rule.label ?? ruleId} は ${rule.validTo} まで`);
+        }
+        if (rule?.requiredInterfaces) {
+          for (const iface of rule.requiredInterfaces) requiredInterfaceSet.add(iface);
         }
       }
       upstreamIds.push(hop.kind === "pay" ? hop.method.id : hop.from.id);
@@ -67,8 +71,9 @@ export function recommend(input: RecommendInput): RankedRoute[] {
       breakdown,
       totalByPointType,
       totalYenByPointType,
-      expiringBonus: expiring,
+      expiringBonuses,
       capHints,
+      requiredInterfaces: [...requiredInterfaceSet] as RankedRoute["requiredInterfaces"],
     };
   });
 

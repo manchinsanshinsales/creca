@@ -3,6 +3,7 @@
     "id": "seven_eleven",
     "chain": "セブン-イレブン",
     "category": "convenience",
+    "aliases": ["セブン", "711", "7-11", "セブンイレブン", "7eleven", "7&i"],
     "acceptedMethodIds": [
       "smbc_nl", "rakuten_card", "jcb_w", "d_card", "aeon_card", "view_card", "recruit_card",
       "ana_sora", "rakuten_pay", "d_barai", "paypay", "suica", "waon"
@@ -12,6 +13,7 @@
     "id": "lawson",
     "chain": "ローソン",
     "category": "convenience",
+    "aliases": ["ロー", "Lawson"],
     "acceptedMethodIds": [
       "smbc_nl", "rakuten_card", "jcb_w", "d_card", "aeon_card", "view_card", "recruit_card",
       "ana_sora", "rakuten_pay", "d_barai", "paypay", "suica", "waon"
@@ -21,6 +23,7 @@
     "id": "familymart",
     "chain": "ファミリーマート",
     "category": "convenience",
+    "aliases": ["ファミマ", "FamilyMart", "ファミ"],
     "acceptedMethodIds": [
       "smbc_nl", "rakuten_card", "jcb_w", "d_card", "aeon_card", "view_card", "recruit_card",
       "ana_sora", "rakuten_pay", "d_barai", "paypay", "suica"
@@ -30,6 +33,7 @@
     "id": "mcdonalds",
     "chain": "マクドナルド",
     "category": "fastfood",
+    "aliases": ["マック", "マクド", "McDonald's", "マクドナ"],
     "acceptedMethodIds": [
       "smbc_nl", "rakuten_card", "jcb_w", "d_card", "aeon_card", "recruit_card", "ana_sora",
       "d_barai", "paypay", "rakuten_pay", "waon", "suica"
@@ -39,6 +43,7 @@
     "id": "starbucks",
     "chain": "スターバックス",
     "category": "cafe",
+    "aliases": ["スタバ", "Starbucks", "スターバック"],
     "acceptedMethodIds": [
       "smbc_nl", "rakuten_card", "jcb_w", "d_card", "view_card", "recruit_card", "ana_sora",
       "d_barai", "paypay", "rakuten_pay", "suica"
@@ -48,6 +53,7 @@
     "id": "saizeriya",
     "chain": "サイゼリヤ",
     "category": "restaurant",
+    "aliases": ["サイゼ", "Saizeriya", "サイゼリア"],
     "acceptedMethodIds": [
       "smbc_nl", "rakuten_card", "jcb_w", "d_card", "ana_sora",
       "paypay", "suica"
@@ -57,6 +63,7 @@
     "id": "aeon",
     "chain": "イオン",
     "category": "supermarket",
+    "aliases": ["AEON", "Aeon", "ジャスコ", "イオンモール"],
     "acceptedMethodIds": [
       "smbc_nl", "rakuten_card", "jcb_w", "aeon_card", "ana_sora",
       "paypay", "d_barai", "waon", "suica"
@@ -66,6 +73,7 @@
     "id": "jr_ekinaka",
     "chain": "JR駅ナカ (エキュート等)",
     "category": "transit",
+    "aliases": ["エキュート", "エキナカ", "駅ナカ", "JR", "エキュ"],
     "acceptedMethodIds": [
       "smbc_nl", "rakuten_card", "jcb_w", "view_card", "recruit_card", "ana_sora",
       "suica"

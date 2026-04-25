@@ -73,3 +73,47 @@ export function saveAmount(n: number) {
   if (typeof window === "undefined") return;
   window.localStorage.setItem(AMOUNT_KEY, String(n));
 }
+
+// ── Payment log ──────────────────────────────────────────────────────────────
+const PAYMENT_LOG_KEY = "creca:payment-log:v1";
+const MAX_LOG_ENTRIES = 200;
+
+export type PaymentLogEntry = {
+  id: string;
+  storeId: string;
+  storeName: string;
+  amountYen: number;
+  earnedYen: number;
+  timestamp: number;
+};
+
+export function getPaymentLog(): PaymentLogEntry[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(PAYMENT_LOG_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed as PaymentLogEntry[];
+  } catch {
+    return [];
+  }
+}
+
+export function addPaymentLog(entry: Omit<PaymentLogEntry, "id">): void {
+  if (typeof window === "undefined") return;
+  const log = getPaymentLog();
+  const next: PaymentLogEntry = { ...entry, id: `${Date.now()}-${Math.random().toString(36).slice(2)}` };
+  window.localStorage.setItem(
+    PAYMENT_LOG_KEY,
+    JSON.stringify([next, ...log].slice(0, MAX_LOG_ENTRIES)),
+  );
+}
+
+export function getMonthlyEarnings(now = new Date()): number {
+  const log = getPaymentLog();
+  const start = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  return log
+    .filter((e) => e.timestamp >= start)
+    .reduce((sum, e) => sum + e.earnedYen, 0);
+}

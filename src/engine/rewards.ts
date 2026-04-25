@@ -6,9 +6,19 @@ import type {
 } from "@/schemas";
 import type { ComputeContext, Hop, PointsEarned, RewardBreakdown } from "./types";
 
+function parseLocalDayStart(s: string): number {
+  const [y, m, d] = s.split("-").map(Number);
+  return new Date(y, m - 1, d).getTime();
+}
+
+function parseLocalDayEnd(s: string): number {
+  const [y, m, d] = s.split("-").map(Number);
+  return new Date(y, m - 1, d, 23, 59, 59, 999).getTime();
+}
+
 export function isRuleActive(rule: BonusRule, now: Date): boolean {
-  if (rule.validFrom && Date.parse(rule.validFrom) > now.getTime()) return false;
-  if (rule.validTo && Date.parse(rule.validTo) < now.getTime()) return false;
+  if (rule.validFrom && parseLocalDayStart(rule.validFrom) > now.getTime()) return false;
+  if (rule.validTo && parseLocalDayEnd(rule.validTo) < now.getTime()) return false;
   return true;
 }
 
@@ -29,6 +39,7 @@ function findPayRules(
   method: PaymentMethod,
   store: Store,
   upstreamMethodIds: string[],
+  amountYen: number,
   now: Date,
 ): BonusRule[] {
   return rules.filter((r) => {
@@ -41,6 +52,7 @@ function findPayRules(
       const chainIds = new Set([method.id, ...upstreamMethodIds]);
       if (!chainIds.has(r.trigger.viaMethodId)) return false;
     }
+    if (r.minAmountYen && amountYen < r.minAmountYen) return false;
     if (!isRuleActive(r, now)) return false;
     return true;
   });
@@ -50,12 +62,14 @@ function findChargeRules(
   rules: BonusRule[],
   from: PaymentMethod,
   to: PaymentMethod,
+  amountYen: number,
   now: Date,
 ): BonusRule[] {
   return rules.filter((r) => {
     if (r.trigger.kind !== "charge") return false;
     if (r.trigger.fromMethodId !== from.id) return false;
     if (r.trigger.toMethodId !== to.id) return false;
+    if (r.minAmountYen && amountYen < r.minAmountYen) return false;
     if (!isRuleActive(r, now)) return false;
     return true;
   });
@@ -118,7 +132,7 @@ export function computeHopRewards(
   const pointValue = (id: string) => ctx.pointTypes.get(id)?.monetaryValuePerPoint ?? 1;
 
   if (hop.kind === "pay") {
-    const rules = findPayRules(ctx.bonusRules, hop.method, store, upstreamMethodIds, ctx.now);
+    const rules = findPayRules(ctx.bonusRules, hop.method, store, upstreamMethodIds, amountYen, ctx.now);
     const { earned, appliedRuleIds } = applyStacking(
       hop.method.baseReward ?? null,
       rules,
@@ -138,7 +152,7 @@ export function computeHopRewards(
 
   // Charge hop: award earned-on-charge if edge says so; apply any charge BonusRule via stacking.
   const edge = hop.to.chargeableFrom.find((e) => e.fromMethodId === hop.from.id);
-  const rules = findChargeRules(ctx.bonusRules, hop.from, hop.to, ctx.now);
+  const rules = findChargeRules(ctx.bonusRules, hop.from, hop.to, amountYen, ctx.now);
 
   // Default "base" reward on charge = the `from` card's baseReward if earnsPoints is true.
   let base: Reward | null = null;
