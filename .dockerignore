@@ -1,0 +1,9 @@
+node_modules
+.next
+.git
+Dockerfile
+.dockerignore
+.gitignore
+creca_deploy
+README.md
+pnpm-debug.log
