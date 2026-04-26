@@ -3,6 +3,8 @@ node_modules
 .vercel
 .DS_Store
 *.log
-.env*.local
+.env
+.env.*
+!.env.example
 next-env.d.ts
 .turbo
