@@ -29,17 +29,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ja">
       <body className="min-h-screen font-sans">
-        <header className="sticky top-0 z-10 border-b border-border bg-bg/80 backdrop-blur">
-          <nav className="mx-auto flex max-w-xl items-center justify-between px-4 py-3">
-            <Link href="/" className="text-lg font-bold tracking-tight">
-              <span className="text-accent">creca</span>
-            </Link>
-            <div className="flex gap-1 text-sm">
-              <Link href="/recommend" className="btn">
-                推薦
+        <header className="sticky top-0 z-20 bg-transparent">
+          <nav className="mx-auto flex max-w-xl items-center justify-end px-4 py-3">
+            <div className="flex gap-2 text-xs font-medium">
+              <Link href="/recommend" className="hover:text-accent transition-colors">
+                店舗一覧
               </Link>
-              <Link href="/wallet" className="btn">
-                保有
+              <Link href="/wallet" className="hover:text-accent transition-colors">
+                保有決済
               </Link>
             </div>
           </nav>
