@@ -38,6 +38,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <Link href="/wallet" className="hover:text-accent transition-colors">
                 保有決済
               </Link>
+              <Link href="/history" className="hover:text-accent transition-colors">
+                履歴
+              </Link>
             </div>
           </nav>
         </header>
