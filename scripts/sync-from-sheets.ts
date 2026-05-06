@@ -34,7 +34,8 @@ function parseCsv(text: string): Record<string, string>[] {
     const cols = splitCsvRow(line);
     const row: Record<string, string> = {};
     headers.forEach((h, i) => {
-      row[h.trim()] = (cols[i] ?? "").trim();
+      // Normalize to lowercase so "ID", "Id", "id" all resolve to the same key.
+      row[h.trim().toLowerCase()] = (cols[i] ?? "").trim();
     });
     return row;
   });
@@ -65,7 +66,9 @@ function splitCsvRow(line: string): string[] {
 }
 
 // ─── Column mapping ───────────────────────────────────────────────────────────
-// TODO: Update these after running `pnpm sync-data --inspect` to see actual column names.
+// Headers are normalized to lowercase by parseCsv, so all lookups use lowercase.
+// Expected English column names: id, chain, category, aliases, acceptedmethodids, notes
+// Japanese fallbacks:            店舗id, 店舗名/チェーン名, カテゴリ, 別名, 対応決済, 備考
 
 type StoreRow = {
   id: string;
@@ -77,9 +80,7 @@ type StoreRow = {
 };
 
 function mapStoreRow(row: Record<string, string>): StoreRow | null {
-  // Map sheet column names → StoreRow fields.
-  // Adjust column names to match your actual sheet headers.
-  const id = row["id"] ?? row["ID"] ?? row["店舗ID"];
+  const id = row["id"] ?? row["店舗id"];
   const chain = row["chain"] ?? row["店舗名"] ?? row["チェーン名"];
   const category = row["category"] ?? row["カテゴリ"];
   if (!id || !chain || !category) return null;
@@ -88,15 +89,24 @@ function mapStoreRow(row: Record<string, string>): StoreRow | null {
     chain,
     category,
     aliases: row["aliases"] ?? row["別名"] ?? "",
-    acceptedMethodIds: row["acceptedMethodIds"] ?? row["対応決済"] ?? "",
+    acceptedMethodIds: row["acceptedmethodids"] ?? row["対応決済"] ?? "",
     notes: row["notes"] ?? row["備考"] ?? undefined,
   };
 }
 
 function buildStoreJson(rows: Record<string, string>[]) {
+  const seen = new Set<string>();
   return rows
     .map(mapStoreRow)
     .filter((r): r is StoreRow => r !== null)
+    .filter((r) => {
+      if (seen.has(r.id)) {
+        console.warn(`Duplicate store id skipped: ${r.id}`);
+        return false;
+      }
+      seen.add(r.id);
+      return true;
+    })
     .map((r) => ({
       id: r.id,
       chain: r.chain,
